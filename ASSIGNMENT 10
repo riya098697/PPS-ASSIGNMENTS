@@ -1,1 +1,71 @@
+#include <stdio.h>
 
+// Function to check if a given year is a leap year
+int isLeapYear(int year) {
+    if ((year % 400 == 0) || (year % 4 == 0 && year % 100 != 0)) {
+        return 1;
+    }
+    return 0;
+}
+
+// Function to determine the first day of the year (0 = Sun, 1 = Mon, ..., 6 = Sat)
+// Uses Zeller's Congruence / Gregorian calendar shift algorithm
+int getFirstDayOfYear(int year) {
+    int d = (((year - 1) * 365) + ((year - 1) / 4) - ((year - 1) / 100) + ((year - 1) / 400) + 1) % 7;
+    return d;
+}
+
+int main() {
+    int year, month, day, daysInMonth, weekDay = 0, startingDay;
+
+    char *months[] = {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    };
+
+    int monthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    printf("Enter the year: ");
+    if (scanf("%d", &year) != 1 || year < 1) {
+        printf("Invalid year entered.\n");
+        return 1;
+    }
+
+    // Adjust February days if it is a leap year
+    if (isLeapYear(year)) {
+        monthDays[1] = 29;
+    }
+
+    // Get the starting weekday for January 1st of the input year
+    startingDay = getFirstDayOfYear(year);
+
+    printf("\n==================== CALENDAR - %d ====================\n", year);
+
+    for (month = 0; month < 12; month++) {
+        daysInMonth = monthDays[month];
+
+        printf("\n\n  ------------ %s ------------\n", months[month]);
+        printf("  Sun  Mon  Tue  Wed  Thu  Fri  Sat\n");
+
+        // Print leading spaces for the first week of the month
+        for (weekDay = 0; weekDay < startingDay; weekDay++) {
+            printf("     ");
+        }
+
+        // Print all days of the current month
+        for (day = 1; day <= daysInMonth; day++) {
+            printf("%5d", day);
+
+            if (++weekDay > 6) {
+                printf("\n");
+                weekDay = 0;
+            }
+        }
+
+        // Set the starting weekday for the next month
+        startingDay = weekDay;
+    }
+
+    printf("\n\n=========================================================\n");
+    return 0;
+}
