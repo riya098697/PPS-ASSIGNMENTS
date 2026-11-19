@@ -1,1 +1,125 @@
+#include <stdio.h>
+#include <string.h>
 
+#define MAX_LEN 100
+
+void read_string(const char *prompt, char *buf, size_t size) {
+    printf("%s", prompt);
+    if (fgets(buf, (int)size, stdin) != NULL) {
+        size_t len = strlen(buf);
+        if (len > 0 && buf[len - 1] == '\n') {
+            buf[len - 1] = '\0';
+        }
+    } else {
+        buf[0] = '\0';
+    }
+}
+
+void clear_input_buffer(void) {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF) {
+    }
+}
+
+int main(void) {
+    char str1[MAX_LEN];
+    char str2[MAX_LEN];
+    int choice = 0;
+
+    read_string("Enter a string: ", str1, sizeof(str1));
+
+    do {
+        printf("\n--- String Operations Menu ---\n");
+        printf("1. String Length (strlen)\n");
+        printf("2. String Copy (strcpy)\n");
+        printf("3. String Concatenation (strcat)\n");
+        printf("4. String Comparison (strcmp)\n");
+        printf("5. Find Character (strchr)\n");
+        printf("6. Find Substring (strstr)\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            clear_input_buffer();
+            continue;
+        }
+        clear_input_buffer();
+
+        switch (choice) {
+            case 1:
+                printf("Length of \"%s\" is %zu\n", str1, strlen(str1));
+                break;
+
+            case 2:
+                read_string("Enter source string to copy into primary string: ", str2, sizeof(str2));
+                if (strlen(str2) < sizeof(str1)) {
+                    strcpy(str1, str2);
+                    printf("Updated primary string: \"%s\"\n", str1);
+                } else {
+                    printf("Error: Source string exceeds buffer size.\n");
+                }
+                break;
+
+            case 3:
+                read_string("Enter string to append: ", str2, sizeof(str2));
+                if (strlen(str1) + strlen(str2) < sizeof(str1)) {
+                    strcat(str1, str2);
+                    printf("Concatenated string: \"%s\"\n", str1);
+                } else {
+                    printf("Error: Combined string exceeds buffer size.\n");
+                }
+                break;
+
+            case 4:
+                read_string("Enter second string to compare: ", str2, sizeof(str2));
+                {
+                    int cmp = strcmp(str1, str2);
+                    if (cmp == 0) {
+                        printf("\"%s\" and \"%s\" are equal.\n", str1, str2);
+                    } else if (cmp < 0) {
+                        printf("\"%s\" is less than \"%s\".\n", str1, str2);
+                    } else {
+                        printf("\"%s\" is greater than \"%s\".\n", str1, str2);
+                    }
+                }
+                break;
+
+            case 5: {
+                char ch_buf[4];
+                read_string("Enter a single character to search: ", ch_buf, sizeof(ch_buf));
+                if (ch_buf[0] != '\0') {
+                    char *pos = strchr(str1, ch_buf[0]);
+                    if (pos != NULL) {
+                        printf("Character '%c' found at index %ld.\n", ch_buf[0], (long)(pos - str1));
+                    } else {
+                        printf("Character '%c' not found.\n", ch_buf[0]);
+                    }
+                }
+                break;
+            }
+
+            case 6:
+                read_string("Enter substring to search: ", str2, sizeof(str2));
+                {
+                    char *sub = strstr(str1, str2);
+                    if (sub != NULL) {
+                        printf("Substring \"%s\" found at index %ld.\n", str2, (long)(sub - str1));
+                    } else {
+                        printf("Substring \"%s\" not found.\n", str2);
+                    }
+                }
+                break;
+
+            case 7:
+                printf("Exiting program.\n");
+                break;
+
+            default:
+                printf("Invalid choice! Enter 1 to 7.\n");
+                break;
+        }
+    } while (choice != 7);
+
+    return 0;
+}
